@@ -4,8 +4,8 @@
     |-- artisans.csv
     |-- department.csv
     |-- machines.csv
+    |-- typeoffault.csv
 |-- db_folder
     |-- jobcards.db
     |-- requisitions.db
 |-- mainreq.py
-|-- typeoffault.csv
