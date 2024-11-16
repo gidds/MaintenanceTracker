@@ -1,0 +1,11 @@
+|-- Projectplan.txt
+|-- csv
+    |-- apprentice.csv
+    |-- artisans.csv
+    |-- department.csv
+    |-- machines.csv
+    |-- typeoffault.csv
+|-- db_folder
+    |-- jobcards.db
+    |-- requisitions.db
+|-- mainreq.py
