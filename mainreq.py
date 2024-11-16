@@ -233,6 +233,7 @@ class MaintenanceTracker(QWidget):
         self.reqnum_combobox = QComboBox()
         tab1grid_layout.addWidget(reqnum_label, 1, 0)
         tab1grid_layout.addWidget(self.reqnum_combobox, 1, 1)
+        
 
         #Jobcard number
         jobcard_num_label = QLabel("Jobcard Number:")
