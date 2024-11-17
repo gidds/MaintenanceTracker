@@ -63,7 +63,9 @@ class MaintenanceTracker(QWidget):
                 artisan TEXT,
                 machine TEXT,
                 department TEXT,
-                apprentice TEXT,
+                apprentice1 TEXT,
+                apprentice2 TEXT,
+                apprentice3 TEXT,
                 typeoffault TEXT,
                 FOREIGN KEY (requisition_id) REFERENCES requisitions(id)
                 )
@@ -101,15 +103,17 @@ class MaintenanceTracker(QWidget):
         artisan = self.artisan_input.currentText()
         machine = self.machine_input.currentText()
         department = self.department_input.currentText()
-        apprentice = self.apprentice_input.currentText()
+        apprentice1 = self.apprentice_input.currentText()
+        apprentice2 = self.apprentice_input2.currentText()
+        apprentice3 = self.apprentice_input3.currentText()
         typeoffault = self.type_of_fault_input.currentText()
 
         conn_job = sqlite3.connect(JOBCARDS_DB)
         cursor_job = conn_job.cursor()
         cursor_job.execute('''
-            INSERT INTO jobcards (number, work_request, time_start, time_stop, time_diff, date_created, date_last_modified, requisition_id, artisan, machine, department, apprentice, typeoffault)
-            VALUES (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?)
-            ''', (jobcard_num, work_request, time_start, time_stop, time_diff, date_created, date_last_modified, reqnum, artisan, machine, department, apprentice, typeoffault))
+            INSERT INTO jobcards (number, work_request, time_start, time_stop, time_diff, date_created, date_last_modified, requisition_id, artisan, machine, department, apprentice1, apprentice2, apprentice3, typeoffault)
+            VALUES (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (jobcard_num, work_request, time_start, time_stop, time_diff, date_created, date_last_modified, reqnum, artisan, machine, department, apprentice1, apprentice2, apprentice3, typeoffault))
         conn_job.commit()
         conn_job.close()
 
@@ -145,8 +149,9 @@ class MaintenanceTracker(QWidget):
         cursor.execute("SELECT number FROM requisitions")
         rows = cursor.fetchall()
         self.reqnum_combobox.clear()
+        self.reqnum_combobox.insertItem(0, "Select Requisition Number")
         for number in rows:
-            self.reqnum_combobox.addItem(number[0])
+            self.reqnum_combobox.addItem(number[1])
         conn.close()
 
     def populate_work_request(self):
@@ -163,8 +168,8 @@ class MaintenanceTracker(QWidget):
         rowswho = cursor.fetchall()
         for requested_by in rowswho:
             self.requested_by_jinput.setText(requested_by[0])
-        
-        conn.close()
+            
+            conn.close()
 
     def populate_departments(self):
         self.department_input.clear()
@@ -189,10 +194,14 @@ class MaintenanceTracker(QWidget):
     
     def populate_apprentices(self):
         self.apprentice_input.clear()
+        self.apprentice_input2.clear()
+        self.apprentice_input3.clear()
         with open("csv/apprentice.csv", "r") as file:
             reader = csv.reader(file)
             for row in reader:
                 self.apprentice_input.addItem(row[0])
+                self.apprentice_input2.addItem(row[0])
+                self.apprentice_input3.addItem(row[0])
     
     def populate_typeoffault(self):
         self.type_of_fault_input.clear()
@@ -309,17 +318,32 @@ class MaintenanceTracker(QWidget):
         self.artisan_input = QComboBox()
         tab1form_layout.addRow(artisan_label, self.artisan_input)
 
+        #Apprentice Grid layout
+        apprentice_grid_layout = QGridLayout()
+        tab1form_layout.addRow("Apprentice:", apprentice_grid_layout)
+
         #Apprentice ComboBox
-        apprentice_label = QLabel("Apprentice:")
+        apprentice_label = QLabel("Apprentice 1:")
         self.apprentice_input = QComboBox()
-        tab1form_layout.addRow(apprentice_label, self.apprentice_input)
+        apprentice_label2 = QLabel("Apprentice 2:")
+        self.apprentice_input2 = QComboBox()
+        apprentice_label3 = QLabel("Apprentice 3:")
+        self.apprentice_input3 = QComboBox()
+        apprentice_grid_layout.addWidget(apprentice_label, 0, 0)
+        apprentice_grid_layout.addWidget(apprentice_label, 0, 0)
+        apprentice_grid_layout.addWidget(self.apprentice_input, 1, 0)
+        apprentice_grid_layout.addWidget(apprentice_label2, 0, 1)
+        apprentice_grid_layout.addWidget(self.apprentice_input2, 1, 1)
+        apprentice_grid_layout.addWidget(apprentice_label3, 0, 2)
+        apprentice_grid_layout.addWidget(self.apprentice_input3, 1, 2)
+        #tab1form_layout.addRow(apprentice_label, self.apprentice_input)
+        
 
         #label to show time taken calculated from time stop and time start
         self.time_taken_label = QLabel("Time Taken: 00:00:00")
         tab1form_layout.addRow(self.time_taken_label)
         self.time_stop_input.timeChanged.connect(self.calculate_time)
         
-
         #save button
         save_button = QPushButton("Save")
         #change button width and centre
@@ -397,7 +421,6 @@ class MaintenanceTracker(QWidget):
         seconds = time_diff % 60
         time_diff_string = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
         self.time_taken_label.setText(str("Time Taken: " + time_diff_string))
-    
     
 
 if __name__ == "__main__":
